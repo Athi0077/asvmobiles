@@ -12,9 +12,9 @@ const categories = [
     image: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&q=80&w=800'
   },
   {
-    name: "Refurbished Mobiles",
-    slug: 'refurbished-mobiles',
-    description: "Clean used/refurbished smartphones",
+    name: "Lite used Mobiles",
+    slug: 'Lite used-mobiles',
+    description: "Clean used/Lite used smartphones",
     image: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&q=80&w=800'
   },
   {

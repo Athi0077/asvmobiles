@@ -45,7 +45,7 @@ const Footer = () => {
             <ul className="space-y-3 text-sm text-gray-500">
               <li><Link to="/products?category=android" className="hover:text-primary transition-colors">Android</Link></li>
               <li><Link to="/products?category=mobile-accessories" className="hover:text-primary transition-colors">Accessories</Link></li>
-              <li><Link to="/products?category=refurbished-mobiles" className="hover:text-primary transition-colors">Refurbished</Link></li>
+              <li><Link to="/products?category=Lite used-mobiles" className="hover:text-primary transition-colors">Lite used</Link></li>
               <li><Link to="/products?category=iphones" className="hover:text-primary transition-colors">iPhones</Link></li>
             </ul>
           </div>

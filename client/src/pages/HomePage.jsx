@@ -23,9 +23,9 @@ const defaultCategories = [
     image: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&q=80&w=800'
   },
   {
-    _id: 'default-refurbished',
-    name: "Refurbished Mobiles",
-    slug: 'refurbished-mobiles',
+    _id: 'default-Lite used',
+    name: "Lite used Mobiles",
+    slug: 'Lite used-mobiles',
     image: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&q=80&w=800'
   },
   {
