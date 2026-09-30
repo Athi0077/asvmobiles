@@ -131,7 +131,7 @@ const HomePage = () => {
                 <Truck size={28} />
               </div>
               <h4 className="font-bold text-gray-900 mb-2">Fast Delivery</h4>
-              <p className="text-sm text-gray-500">Free delivery on orders over $50</p>
+              <p className="text-sm text-gray-500">Free delivery on orders over ₹50</p>
             </div>
             <div className="flex flex-col items-center text-center group">
               <div className="w-16 h-16 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-orange-600 group-hover:text-white transition-all duration-300">
@@ -214,7 +214,7 @@ const HomePage = () => {
               </p>
               <div>
                 <Link to="/products?sort=price_asc">
-                  <Button size="lg" className="rounded-full px-8 bg-white text-gray-900 hover:bg-gray-100 hover:text-black">Explore Deals</Button>
+                  <Button size="lg" className="rounded-full px-8 bg-blue text-gray-900 hover:bg-gray-100 hover:text-black">Explore Deals</Button>
                 </Link>
               </div>
             </div>

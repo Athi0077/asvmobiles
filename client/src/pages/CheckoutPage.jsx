@@ -163,7 +163,7 @@ const CheckoutPage = () => {
           key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TV7hXMB718NUCg',
           amount: Math.round((cartTotal - (couponApplied?.discountAmount || 0)) * 100),
           currency: 'INR',
-          name: 'All in One Store',
+          name: 'ASV Mobiles',
           description: 'Order Payment',
           order_id: orderRes.data.paymentResult.id,
           handler: async function (response) {
@@ -216,9 +216,9 @@ const CheckoutPage = () => {
            const sizeStr = item.size ? ` (Size: ${item.size})` : '';
            const colorStr = item.color ? ` (Color: ${item.color})` : '';
            const imageStr = typeof item.imageIndex === 'number' ? ` [${getOrdinalSuffix(item.imageIndex + 1)} Image]` : '';
-           message += `- ${item.name}${sizeStr}${colorStr}${imageStr} x ${item.qty} ($${((item.discountPrice || item.price) * item.qty).toFixed(2)})\n`;
+           message += `- ${item.name}${sizeStr}${colorStr}${imageStr} x ${item.qty} (₹${((item.discountPrice || item.price) * item.qty).toFixed(2)})\n`;
         });
-        message += `\n*Total:* $${finalTotal}\n\n*Shipping Address:*\n${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.postalCode}, ${shippingAddress.country}`;
+        message += `\n*Total:* ₹${finalTotal}\n\n*Shipping Address:*\n${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.postalCode}, ${shippingAddress.country}`;
         
         const encodedMessage = encodeURIComponent(message);
         window.open(`https://wa.me/916379981170?text=${encodedMessage}`, '_blank');
@@ -397,7 +397,7 @@ const CheckoutPage = () => {
                     <div className="flex items-baseline gap-2 mt-1">
                       <p className="text-sm font-medium text-gray-900">{item.qty} x ${(item.discountPrice || item.price).toFixed(2)}</p>
                       {item.discountPrice && (
-                        <p className="text-xs text-gray-500 line-through">${item.price.toFixed(2)}</p>
+                        <p className="text-xs text-gray-500 line-through">₹{item.price.toFixed(2)}</p>
                       )}
                     </div>
                   </div>
@@ -425,7 +425,7 @@ const CheckoutPage = () => {
             <div className="space-y-4 mb-6 text-gray-600">
               <div className="flex justify-between">
                 <span>Items Total</span>
-                <span className="font-medium text-gray-900">${cartTotal.toFixed(2)}</span>
+                <span className="font-medium text-gray-900">₹{cartTotal.toFixed(2)}</span>
               </div>
               {couponApplied && (
                 <div className="flex justify-between text-green-600">
@@ -435,13 +435,13 @@ const CheckoutPage = () => {
               )}
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span className="font-medium text-gray-900">{cartShipping === 0 ? <span className="text-green-600">Free</span> : `$${cartShipping.toFixed(2)}`}</span>
+                <span className="font-medium text-gray-900">{cartShipping === 0 ? <span className="text-green-600">Free</span> : `₹${cartShipping.toFixed(2)}`}</span>
               </div>
             </div>
             
             <div className="border-t border-gray-200 pt-4 mb-6 flex justify-between items-center">
               <span className="text-lg font-bold text-gray-900">Total</span>
-              <span className="text-2xl font-black text-gray-900">${(cartTotal + cartShipping - (couponApplied?.discountAmount || 0)).toFixed(2)}</span>
+              <span className="text-2xl font-black text-gray-900">₹{(cartTotal + cartShipping - (couponApplied?.discountAmount || 0)).toFixed(2)}</span>
             </div>
             
             <Button 

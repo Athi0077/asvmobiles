@@ -22,7 +22,7 @@ export const sendEmail = async ({ to, subject, html }) => {
   });
 
   const mailOptions = {
-    from: `"All-in-One Store" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+    from: `"ASV Mobiles" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
     to,
     subject,
     html,

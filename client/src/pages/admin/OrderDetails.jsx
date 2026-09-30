@@ -85,8 +85,7 @@ const OrderDetails = () => {
                     <p className="font-bold text-gray-900 line-clamp-1">{item.name}</p>
                     <p className="text-sm text-gray-500">Qty: {item.qty} × ${item.price.toFixed(2)}</p>
                   </div>
-                  <div className="text-right font-bold text-gray-900">
-                    ${(item.price * item.qty).toFixed(2)}
+                  <div className="text-right font-bold text-gray-900">₹{(item.price * item.qty).toFixed(2)}
                   </div>
                 </div>
               ))}
@@ -138,12 +137,12 @@ const OrderDetails = () => {
           <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-6">Order Summary</h2>
             <div className="space-y-4 text-sm text-gray-600 mb-6 border-b border-gray-200 pb-6">
-              <div className="flex justify-between"><span>Items Subtotal</span><span className="font-medium text-gray-900">${order.subtotal.toFixed(2)}</span></div>
-              <div className="flex justify-between"><span>Shipping</span><span className="font-medium text-gray-900">${order.shippingCharge.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span>Items Subtotal</span><span className="font-medium text-gray-900">₹{order.subtotal.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span>Shipping</span><span className="font-medium text-gray-900">₹{order.shippingCharge.toFixed(2)}</span></div>
             </div>
             <div className="flex justify-between items-center mb-2">
               <span className="text-base font-bold text-gray-900">Total</span>
-              <span className="text-2xl font-black text-gray-900">${order.total.toFixed(2)}</span>
+              <span className="text-2xl font-black text-gray-900">₹{order.total.toFixed(2)}</span>
             </div>
           </div>
 

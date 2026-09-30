@@ -89,7 +89,7 @@ const OrdersPage = () => {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">Total</p>
-                    <p className="text-sm font-medium text-gray-900">${order.total.toFixed(2)}</p>
+                    <p className="text-sm font-medium text-gray-900">₹{order.total.toFixed(2)}</p>
                   </div>
                   <div className="sm:col-span-2">
                     <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">Order #</p>

@@ -141,7 +141,7 @@ const CouponManagement = () => {
                   <tr key={coupon._id} className="hover:bg-gray-50 transition-colors">
                     <td className="py-4 px-6 font-bold text-gray-900">{coupon.code}</td>
                     <td className="py-4 px-6 text-sm text-gray-600">
-                      {coupon.discountType === 'Percentage' ? `${coupon.discountValue}%` : `$${coupon.discountValue}`}
+                      {coupon.discountType === 'Percentage' ? `${coupon.discountValue}%` : `₹${coupon.discountValue}`}
                     </td>
                     <td className="py-4 px-6 text-sm text-gray-600">{new Date(coupon.expiryDate).toLocaleDateString()}</td>
                     <td className="py-4 px-6 text-sm text-gray-600">{coupon.usedCount} / {coupon.usageLimit}</td>

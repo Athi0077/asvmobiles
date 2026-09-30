@@ -80,7 +80,7 @@ const UserDetails = () => {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500">Total Spent</span>
-                <span className="text-lg font-bold text-gray-900">${totalSpent.toFixed(2)}</span>
+                <span className="text-lg font-bold text-gray-900">₹{totalSpent.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -113,7 +113,7 @@ const UserDetails = () => {
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <p className="font-bold text-gray-900">${order.total.toFixed(2)}</p>
+                        <p className="font-bold text-gray-900">₹{order.total.toFixed(2)}</p>
                         <p className="text-xs text-gray-500">{order.items.length} items</p>
                       </div>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${

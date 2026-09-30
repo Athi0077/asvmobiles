@@ -113,9 +113,9 @@ const ProductCard = ({ product }) => {
 
         <div className="mt-auto flex items-center justify-between gap-2">
           <div className="flex flex-wrap items-baseline gap-1.5">
-            <span className="text-lg font-bold text-text">${currentPrice.toFixed(2)}</span>
+            <span className="text-lg font-bold text-text">₹{currentPrice.toFixed(2)}</span>
             {product.discountPrice > 0 && (
-              <span className="text-xs sm:text-sm text-text-muted line-through">${product.price.toFixed(2)}</span>
+              <span className="text-xs sm:text-sm text-text-muted line-through">₹{product.price.toFixed(2)}</span>
             )}
             <ComparePricesButton productName={product.name} />
           </div>

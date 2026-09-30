@@ -11,7 +11,7 @@ const newCategories = [
     description: "Android smartphones",
     image: 'https://images.unsplash.com/photo-1598327105666-5b89351cb315?auto=format&fit=crop&q=80&w=800'
   },
-  {
+  { 
     name: "Mobile Accessories",
     slug: 'mobile-accessories',
     description: "Mobile cases, headsets, chargers",

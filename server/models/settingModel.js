@@ -4,7 +4,7 @@ const settingSchema = mongoose.Schema(
   {
     storeName: {
       type: String,
-      default: 'All-in-One Store',
+      default: 'ASV Mobiles',
     },
     storeDescription: {
       type: String,

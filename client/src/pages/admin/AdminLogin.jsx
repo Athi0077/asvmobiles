@@ -46,7 +46,7 @@ const AdminLogin = () => {
             <Package size={32} className="text-white" />
           </div>
           <h1 className="text-3xl font-black text-white tracking-tight">Admin Portal</h1>
-          <p className="text-gray-400 mt-2">Sign in to manage the All-in-One Store</p>
+          <p className="text-gray-400 mt-2">Sign in to manage the ASV Mobiles</p>
         </div>
 
         <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800 shadow-2xl">
@@ -62,7 +62,7 @@ const AdminLogin = () => {
                 required
               />
             </div>
-            
+
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
               <input
@@ -75,8 +75,8 @@ const AdminLogin = () => {
               />
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full rounded-xl py-3 text-lg font-bold shadow-lg shadow-primary/20"
               isLoading={loading}
             >
@@ -86,7 +86,7 @@ const AdminLogin = () => {
         </div>
 
         <p className="text-center text-gray-500 text-sm mt-8">
-          &copy; {new Date().getFullYear()} All-in-One Store. All rights reserved.
+          &copy; {new Date().getFullYear()} ASV Mobiles. All rights reserved.
         </p>
       </div>
     </div>

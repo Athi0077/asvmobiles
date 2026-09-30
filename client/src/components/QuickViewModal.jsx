@@ -99,9 +99,9 @@ const QuickViewModal = ({ product, onClose }) => {
           </div>
 
           <div className="flex items-baseline gap-3 mb-6">
-            <span className="text-3xl font-black text-gray-900">${currentPrice.toFixed(2)}</span>
+            <span className="text-3xl font-black text-gray-900">₹{currentPrice.toFixed(2)}</span>
             {product.discountPrice > 0 && (
-              <span className="text-lg text-gray-400 line-through">${product.price.toFixed(2)}</span>
+              <span className="text-lg text-gray-400 line-through">₹{product.price.toFixed(2)}</span>
             )}
           </div>
 

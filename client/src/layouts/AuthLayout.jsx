@@ -5,7 +5,7 @@ const AuthLayout = () => {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md bg-surface p-8 rounded-xl shadow-lg border border-border">
         <div className="text-center mb-8">
-          <Link to="/" className="text-2xl font-bold text-primary">All-in-One Store</Link>
+          <Link to="/" className="text-2xl font-bold text-primary">ASV Mobiles</Link>
         </div>
         <Outlet />
       </div>

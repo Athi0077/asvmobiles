@@ -119,7 +119,7 @@ const ProductManagement = () => {
                       </div>
                     </td>
                     <td className="py-4 px-6 text-sm text-gray-600">{product.category?.name || 'N/A'}</td>
-                    <td className="py-4 px-6 text-sm font-bold text-gray-900">${product.price.toFixed(2)}</td>
+                    <td className="py-4 px-6 text-sm font-bold text-gray-900">₹{product.price.toFixed(2)}</td>
                     <td className="py-4 px-6 text-sm">
                       <span className={`font-semibold ${product.stock > 10 ? 'text-green-600' : product.stock > 0 ? 'text-orange-500' : 'text-red-500'}`}>
                         {product.stock}

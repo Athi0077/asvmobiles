@@ -70,9 +70,9 @@ const CartPage = () => {
                         <div className="text-sm text-gray-500 mt-1">Color: {item.color}</div>
                       )}
                       <div className="mt-1 sm:hidden flex flex-wrap items-baseline gap-1.5">
-                        <span className="text-gray-900 font-bold">${(item.discountPrice || item.price).toFixed(2)}</span>
+                        <span className="text-gray-900 font-bold">₹{(item.discountPrice || item.price).toFixed(2)}</span>
                         {item.discountPrice && (
-                          <span className="text-xs text-gray-500 line-through">${item.price.toFixed(2)}</span>
+                          <span className="text-xs text-gray-500 line-through">₹{item.price.toFixed(2)}</span>
                         )}
                       </div>
                     </div>
@@ -100,9 +100,9 @@ const CartPage = () => {
                   
                   {/* Price */}
                   <div className="hidden sm:block col-span-2 text-right">
-                    <div className="font-bold text-gray-900">${(item.qty * (item.discountPrice || item.price)).toFixed(2)}</div>
+                    <div className="font-bold text-gray-900">₹{(item.qty * (item.discountPrice || item.price)).toFixed(2)}</div>
                     {item.discountPrice && (
-                      <div className="text-xs text-gray-500 line-through">${(item.qty * item.price).toFixed(2)}</div>
+                      <div className="text-xs text-gray-500 line-through">₹{(item.qty * item.price).toFixed(2)}</div>
                     )}
                   </div>
                   
@@ -129,11 +129,11 @@ const CartPage = () => {
             <div className="space-y-4 mb-6 text-gray-600">
               <div className="flex justify-between">
                 <span>Subtotal ({cartItems.reduce((acc, item) => acc + item.qty, 0)} items)</span>
-                <span className="font-medium text-gray-900">${cartTotal.toFixed(2)}</span>
+                <span className="font-medium text-gray-900">₹{cartTotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span className="font-medium text-gray-900">{cartShipping === 0 ? <span className="text-green-600">Free</span> : `$${cartShipping.toFixed(2)}`}</span>
+                <span className="font-medium text-gray-900">{cartShipping === 0 ? <span className="text-green-600">Free</span> : `₹${cartShipping.toFixed(2)}`}</span>
               </div>
               <div className="flex justify-between">
                 <span>Tax</span>
@@ -143,7 +143,7 @@ const CartPage = () => {
             
             <div className="border-t border-gray-200 pt-4 mb-6 flex justify-between items-center">
               <span className="text-lg font-bold text-gray-900">Total</span>
-              <span className="text-2xl font-black text-gray-900">${(cartTotal + cartShipping).toFixed(2)}</span>
+              <span className="text-2xl font-black text-gray-900">₹{(cartTotal + cartShipping).toFixed(2)}</span>
             </div>
             
             <Button 

@@ -165,7 +165,7 @@ const OrderDetailsPage = () => {
                     <p className="text-sm text-gray-500">Qty: {item.qty}</p>
                   </div>
                   <div className="text-right font-bold text-gray-900 whitespace-nowrap flex flex-col items-end gap-2">
-                    <span>${(item.price * item.qty).toFixed(2)}</span>
+                    <span>₹{(item.price * item.qty).toFixed(2)}</span>
                     {order.orderStatus === 'Delivered' && (
                        <Link to={`/products/${item.product}#reviews`} className="text-xs text-primary font-medium flex items-center hover:underline">
                           <Star size={12} className="mr-1" /> Write Review
@@ -231,11 +231,11 @@ const OrderDetailsPage = () => {
             <div className="space-y-4 text-sm text-gray-600 mb-6 border-b border-gray-200 pb-6">
               <div className="flex justify-between">
                 <span>Items Subtotal</span>
-                <span className="font-medium text-gray-900">${order.subtotal.toFixed(2)}</span>
+                <span className="font-medium text-gray-900">₹{order.subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span className="font-medium text-gray-900">${order.shippingCharge.toFixed(2)}</span>
+                <span className="font-medium text-gray-900">₹{order.shippingCharge.toFixed(2)}</span>
               </div>
               {order.discount > 0 && (
                 <div className="flex justify-between text-green-600">
@@ -245,13 +245,13 @@ const OrderDetailsPage = () => {
               )}
               <div className="flex justify-between">
                 <span>Tax</span>
-                <span className="font-medium text-gray-900">$0.00</span>
+                <span className="font-medium text-gray-900">₹0.00</span>
               </div>
             </div>
             
             <div className="flex justify-between items-center mb-6">
               <span className="text-base font-bold text-gray-900">Total</span>
-              <span className="text-2xl font-black text-gray-900">${order.total.toFixed(2)}</span>
+              <span className="text-2xl font-black text-gray-900">₹{order.total.toFixed(2)}</span>
             </div>
 
             {order.orderStatus === 'Processing' && (

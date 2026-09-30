@@ -192,7 +192,6 @@ const AboutPage = () => {
                     <Phone className="text-primary mt-1 flex-shrink-0" size={24} />
                     <div>
                       <a href="tel:+918838467165" className="block font-bold text-gray-900 hover:text-primary transition-colors mb-1">+91 88384 67165</a>
-                      <a href="tel:+919629908710" className="block font-bold text-gray-900 hover:text-primary transition-colors">+91 96299 08710</a>
                     </div>
                   </div>
                 </div>

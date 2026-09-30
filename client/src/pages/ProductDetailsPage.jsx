@@ -43,7 +43,7 @@ const ProductDetailsPage = () => {
         ]);
         setProduct(productData);
         setReviews(reviewsData);
-        document.title = `${productData.name} | All-in-One Store`;
+        document.title = `${productData.name} | ASV Mobiles`;
       } catch (error) {
         toast.error('Product not found');
         navigate('/products');
@@ -230,9 +230,9 @@ const ProductDetailsPage = () => {
           </div>
 
           <div className="mb-8">
-            <span className="text-4xl font-black text-gray-900">${currentPrice.toFixed(2)}</span>
+            <span className="text-4xl font-black text-gray-900">₹{currentPrice.toFixed(2)}</span>
             {product.discountPrice > 0 && (
-              <span className="ml-3 text-xl text-gray-500 line-through">${product.price.toFixed(2)}</span>
+              <span className="ml-3 text-xl text-gray-500 line-through">₹{product.price.toFixed(2)}</span>
             )}
           </div>
 
@@ -322,7 +322,7 @@ const ProductDetailsPage = () => {
               <div className="p-2 bg-gray-50 rounded-full text-gray-900"><Truck size={20} /></div>
               <div>
                 <p className="font-semibold text-sm">Free Delivery</p>
-                <p className="text-xs">On orders over $50</p>
+                <p className="text-xs">On orders over ₹50</p>
               </div>
             </div>
             <div className="flex items-center gap-3 text-gray-600">

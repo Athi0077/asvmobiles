@@ -142,7 +142,7 @@ const ProductsPage = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-black text-gray-900">
-            {keyword ? `Search Results for "${keyword}"` : category ? `${category.charAt(0).toUpperCase() + category.slice(1)}` : 'All Products'}
+            {keyword ? `Search Results for "₹{keyword}"` : category ? `${category.charAt(0).toUpperCase() + category.slice(1)}` : 'All Products'}
           </h1>
           <p className="text-gray-500 mt-1">Showing {products.length} of {total} products</p>
         </div>

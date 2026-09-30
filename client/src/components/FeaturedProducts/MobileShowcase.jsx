@@ -175,9 +175,9 @@ const MobileShowcase = ({ products }) => {
 
                 <div className="flex items-center justify-between mt-2">
                   <div className="flex flex-col">
-                    <span className="text-xl font-black text-text">${currentPrice.toFixed(2)}</span>
+                    <span className="text-xl font-black text-text">₹{currentPrice.toFixed(2)}</span>
                     {product.discountPrice > 0 && (
-                      <span className="text-sm text-text-muted line-through">${product.price.toFixed(2)}</span>
+                      <span className="text-sm text-text-muted line-through">₹{product.price.toFixed(2)}</span>
                     )}
                   </div>
                   

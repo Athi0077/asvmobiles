@@ -92,7 +92,7 @@ const Settings = () => {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Input 
-              label="Default Shipping Charge ($)" 
+              label="Default Shipping Charge (₹)" 
               name="defaultShippingCharge" 
               type="number" 
               min="0" 
@@ -102,7 +102,7 @@ const Settings = () => {
               required 
             />
             <Input 
-              label="Free Shipping Threshold ($)" 
+              label="Free Shipping Threshold (₹)" 
               name="freeShippingThreshold" 
               type="number" 
               min="0" 

@@ -88,7 +88,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="Total Revenue" 
-          value={`$${stats.totalRevenue.toFixed(2)}`}
+          value={`₹${stats.totalRevenue.toFixed(2)}`}
           icon={DollarSign}
           trend="up"
           trendValue="12.5%"
@@ -151,10 +151,10 @@ const Dashboard = () => {
               <LineChart data={stats.salesData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                 <XAxis dataKey="_id" axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} dx={-10} tickFormatter={(value) => `$${value}`} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} dx={-10} tickFormatter={(value) => `₹${value}`} />
                 <Tooltip 
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  formatter={(value) => [`$${value}`, 'Revenue']}
+                  formatter={(value) => [`₹${value}`, 'Revenue']}
                 />
                 <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} />
               </LineChart>
@@ -205,7 +205,7 @@ const Dashboard = () => {
                     <td className="py-4 px-6 text-sm font-medium text-gray-900">#{order.orderId || order._id.substring(0, 8)}</td>
                     <td className="py-4 px-6 text-sm text-gray-600">{order.user?.name || 'Guest'}</td>
                     <td className="py-4 px-6 text-sm text-gray-600">{new Date(order.createdAt).toLocaleDateString()}</td>
-                    <td className="py-4 px-6 text-sm font-bold text-gray-900">${order.total.toFixed(2)}</td>
+                    <td className="py-4 px-6 text-sm font-bold text-gray-900">₹{order.total.toFixed(2)}</td>
                     <td className="py-4 px-6 text-sm">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         order.orderStatus === 'Delivered' ? 'bg-green-100 text-green-800' :
@@ -237,7 +237,7 @@ const Dashboard = () => {
                 <img src={getImageUrl(product.images[0])} alt={product.name} className="w-12 h-12 rounded-lg object-cover border border-gray-100" />
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-bold text-gray-900 truncate">{product.name}</h4>
-                  <p className="text-xs text-gray-500 truncate">${product.price.toFixed(2)} &bull; {product.stock} in stock</p>
+                  <p className="text-xs text-gray-500 truncate">₹{product.price.toFixed(2)} &bull; {product.stock} in stock</p>
                 </div>
               </div>
             ))}
