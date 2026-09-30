@@ -98,7 +98,6 @@ const ContactPage = () => {
             </div>
             <h3 className="font-bold text-gray-900 mb-1">Call Us</h3>
             <p className="text-sm text-gray-500 font-medium">+91 88384 67165</p>
-            <p className="text-sm text-gray-500 font-medium">96299 08710</p>
           </a>
 
           {/* Address Card */}
@@ -107,7 +106,7 @@ const ContactPage = () => {
               <MapPin size={24} />
             </div>
             <h3 className="font-bold text-gray-900 mb-1">Visit Us</h3>
-            <p className="text-sm text-gray-500 font-medium">No. 22, Dr. Subbarayan Road,<br />Salem - 636 001.</p>
+            <p className="text-sm text-gray-500 font-medium">7,Deepam Complex, 4 Roads, Near by Little Flower School,<br />Salem - 636 007.</p>
           </a>
 
           {/* Instagram Card */}

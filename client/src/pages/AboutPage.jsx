@@ -180,9 +180,10 @@ const AboutPage = () => {
                     <div>
                       <p className="font-bold text-gray-900 mb-1">ASV Mobiles</p>
                       <p className="text-gray-600 leading-relaxed">
-                        No. 22, Dr. Subbarayan Road,<br />
-                        Near Town Railway Station,<br />
-                        Salem - 636 001.
+                       7,Deepam Complex,<br />
+                        4 Roads,<br />
+                        Near by Little Flower School,<br />
+                        Salem - 636 007.
                       </p>
                     </div>
                   </div>
