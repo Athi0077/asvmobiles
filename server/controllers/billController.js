@@ -210,7 +210,7 @@ export const getBills = async (req, res, next) => {
       page,
       pages: Math.ceil(total / limit),
       todaySummary: {
-        totalRevenue,
+        totalRevenue: todayRevenue,
         totalBills: todayBills.length,
         cashTotal,
         upiTotal

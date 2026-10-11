@@ -647,19 +647,19 @@ const POSBillingPage = () => {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Today's Revenue</span>
-              <p className="text-2xl font-black text-primary mt-1">₹{todaySummary.totalRevenue.toFixed(2)}</p>
+              <p className="text-2xl font-black text-primary mt-1">₹{(todaySummary?.totalRevenue || 0).toFixed(2)}</p>
             </div>
             <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Today's Bills</span>
-              <p className="text-2xl font-black text-gray-900 mt-1">{todaySummary.totalBills}</p>
+              <p className="text-2xl font-black text-gray-900 mt-1">{todaySummary?.totalBills || 0}</p>
             </div>
             <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Cash Collection</span>
-              <p className="text-2xl font-black text-emerald-600 mt-1">₹{todaySummary.cashTotal.toFixed(2)}</p>
+              <p className="text-2xl font-black text-emerald-600 mt-1">₹{(todaySummary?.cashTotal || 0).toFixed(2)}</p>
             </div>
             <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">UPI Collection</span>
-              <p className="text-2xl font-black text-blue-600 mt-1">₹{todaySummary.upiTotal.toFixed(2)}</p>
+              <p className="text-2xl font-black text-blue-600 mt-1">₹{(todaySummary?.upiTotal || 0).toFixed(2)}</p>
             </div>
           </div>
 
