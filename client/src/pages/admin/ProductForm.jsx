@@ -11,8 +11,9 @@ import { getCategories } from '../../services/categoryService';
 
 const AVAILABLE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'];
 
-const ProductForm = () => {
-  const { id } = useParams();
+const ProductForm = ({ productId, isModal = false, onSuccess, onCancel }) => {
+  const { id: paramId } = useParams();
+  const id = productId || paramId;
   const navigate = useNavigate();
   const isEdit = Boolean(id);
 
@@ -31,7 +32,7 @@ const ProductForm = () => {
     images: [],
     isFeatured: false,
     isTrending: false,
-    isActive: true,
+    isActive: false, // Default to false: only added to website if checkbox is ticked
   });
 
   const [categories, setCategories] = useState([]);
@@ -68,19 +69,23 @@ const ProductForm = () => {
             sku: data.sku || '',
             productLink: data.productLink || '',
             images: data.images || [],
-            isFeatured: data.isFeatured,
+            isFeatured: data.isFeatured || false,
             isTrending: data.isTrending || false,
-            isActive: data.isActive,
+            isActive: Boolean(data.isActive),
           });
         } catch (error) {
           toast.error('Failed to load product');
-          navigate('/admin/products');
+          if (!isModal) {
+            navigate('/admin/products');
+          }
         }
         setLoading(false);
       };
       fetchProduct();
+    } else {
+      setLoading(false);
     }
-  }, [id, isEdit, navigate]);
+  }, [id, isEdit, navigate, isModal]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -151,14 +156,20 @@ const ProductForm = () => {
 
     setSubmitting(true);
     try {
+      let result;
       if (isEdit) {
-        await updateProduct(id, formData);
-        toast.success('Product updated');
+        result = await updateProduct(id, formData);
+        toast.success('Product updated successfully');
       } else {
-        await createProduct(formData);
-        toast.success('Product created');
+        result = await createProduct(formData);
+        toast.success(formData.isActive ? 'Product created & added to Website' : 'Product added to Stock Inventory');
       }
-      navigate('/admin/products');
+
+      if (isModal && onSuccess) {
+        onSuccess(result);
+      } else {
+        navigate('/admin/products');
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Action failed');
     }
@@ -168,15 +179,20 @@ const ProductForm = () => {
   if (loading) return <div className="p-8"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-4 mb-6">
-        <Link to="/admin/products" className="p-2 text-gray-500 hover:text-gray-900 bg-white rounded-full border border-gray-200">
-          <ArrowLeft size={20} />
-        </Link>
+    <div className={`${isModal ? 'w-full' : 'max-w-4xl mx-auto'} space-y-6`}>
+      <div className="flex items-center gap-4 mb-4">
+        {!isModal && (
+          <Link to="/admin/products" className="p-2 text-gray-500 hover:text-gray-900 bg-white rounded-full border border-gray-200">
+            <ArrowLeft size={20} />
+          </Link>
+        )}
         <div>
           <h1 className="text-2xl font-black text-gray-900 tracking-tight">
-            {isEdit ? 'Edit Product' : 'Create Product'}
+            {isEdit ? 'Edit Product / Stock' : 'Add Product / Stock Entry'}
           </h1>
+          {isModal && (
+            <p className="text-xs text-gray-500 mt-0.5">Fill in product details to add or update store inventory.</p>
+          )}
         </div>
       </div>
 
@@ -327,48 +343,78 @@ const ProductForm = () => {
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-          <h3 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-2">Visibility</h3>
+          <h3 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-2">Website & Stock Visibility</h3>
           
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input 
-              type="checkbox" 
-              name="isActive" 
-              checked={formData.isActive} 
-              onChange={handleChange}
-              className="w-5 h-5 text-primary rounded focus:ring-primary"
-            />
-            <span className="font-medium text-gray-900">Active (Visible in store)</span>
-          </label>
+          <div className={`p-4 rounded-xl border transition-all ${formData.isActive ? 'border-primary/40 bg-primary/5' : 'border-gray-200 bg-gray-50'}`}>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input 
+                type="checkbox" 
+                name="isActive" 
+                checked={formData.isActive} 
+                onChange={handleChange}
+                className="w-5 h-5 text-primary rounded focus:ring-primary mt-0.5 accent-primary cursor-pointer"
+              />
+              <div className="flex-1">
+                <span className="font-bold text-gray-900 text-sm flex items-center gap-2">
+                  Also add in website (Display on online store)
+                  {formData.isActive ? (
+                    <span className="text-[11px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                      Live on Website
+                    </span>
+                  ) : (
+                    <span className="text-[11px] font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
+                      Internal Stock Only
+                    </span>
+                  )}
+                </span>
+                <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                  Optional: Tick panna mattum online website-la வாடிக்கையாளர்களுக்கு காட்டும். Tick pannalana internal stock & billing list-la mattum irukkum.
+                </p>
+              </div>
+            </label>
+          </div>
           
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input 
-              type="checkbox" 
-              name="isFeatured" 
-              checked={formData.isFeatured} 
-              onChange={handleChange}
-              className="w-5 h-5 text-primary rounded focus:ring-primary"
-            />
-            <span className="font-medium text-gray-900">Featured Product</span>
-          </label>
+          {formData.isActive && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
+                <input 
+                  type="checkbox" 
+                  name="isFeatured" 
+                  checked={formData.isFeatured} 
+                  onChange={handleChange}
+                  className="w-4 h-4 text-primary rounded focus:ring-primary"
+                />
+                <span className="text-sm font-medium text-gray-800">Featured Product</span>
+              </label>
 
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input 
-              type="checkbox" 
-              name="isTrending" 
-              checked={formData.isTrending} 
-              onChange={handleChange}
-              className="w-5 h-5 text-primary rounded focus:ring-primary"
-            />
-            <span className="font-medium text-gray-900">Trending Product</span>
-          </label>
+              <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
+                <input 
+                  type="checkbox" 
+                  name="isTrending" 
+                  checked={formData.isTrending} 
+                  onChange={handleChange}
+                  className="w-4 h-4 text-primary rounded focus:ring-primary"
+                />
+                <span className="text-sm font-medium text-gray-800">Trending Product</span>
+              </label>
+            </div>
+          )}
         </div>
 
-        <div className="flex justify-end gap-4">
-          <Link to="/admin/products">
-            <Button type="button" variant="outline" className="rounded-xl px-8">Cancel</Button>
-          </Link>
+        <div className="flex justify-end gap-3 pt-2">
+          {isModal && onCancel ? (
+            <Button type="button" variant="outline" className="rounded-xl px-6" onClick={onCancel}>
+              Cancel
+            </Button>
+          ) : (
+            <Link to="/admin/products">
+              <Button type="button" variant="outline" className="rounded-xl px-6">
+                Cancel
+              </Button>
+            </Link>
+          )}
           <Button type="submit" className="rounded-xl px-8" isLoading={submitting}>
-            {isEdit ? 'Update Product' : 'Create Product'}
+            {isEdit ? 'Update Product' : 'Save Product'}
           </Button>
         </div>
       </form>

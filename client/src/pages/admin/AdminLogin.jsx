@@ -14,7 +14,11 @@ const AdminLogin = () => {
 
   useEffect(() => {
     if (user && user.role === 'admin') {
-      navigate('/admin/dashboard');
+      if (user.email?.toLowerCase() === 'admininvoice@asv.com') {
+        navigate('/admin/billing');
+      } else {
+        navigate('/admin/dashboard');
+      }
     } else if (user && user.role === 'user') {
       navigate('/');
     }
@@ -29,8 +33,13 @@ const AdminLogin = () => {
           toast.error('Access Denied. You are not an admin.');
           navigate('/');
         } else {
-          toast.success('Admin login successful');
-          navigate('/admin/dashboard');
+          const isBillingAdmin = (res.email || email)?.toLowerCase() === 'admininvoice@asv.com';
+          toast.success(isBillingAdmin ? 'Billing Portal Login Successful' : 'Admin login successful');
+          if (isBillingAdmin) {
+            navigate('/admin/billing');
+          } else {
+            navigate('/admin/dashboard');
+          }
         }
       }
     } catch (error) {

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAdminProducts, deleteProduct } from '../../services/adminService';
-import { Plus, Edit, Trash2, Search, Package, Star, ExternalLink } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Package, Star, ExternalLink, X } from 'lucide-react';
 import Button from '../../components/Button';
 import toast from 'react-hot-toast';
 import { getImageUrl } from '../../utils/getImageUrl';
+import ProductForm from './ProductForm';
 
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
@@ -13,6 +14,8 @@ const ProductManagement = () => {
   const [pages, setPages] = useState(1);
   const [keyword, setKeyword] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [editingProductId, setEditingProductId] = useState(null);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -46,14 +49,17 @@ const ProductManagement = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 tracking-tight">Products</h1>
-          <p className="text-gray-500 mt-1">Manage your store's inventory.</p>
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight">Products & Stock</h1>
+          <p className="text-gray-500 mt-1">Manage your store inventory, website products, and stock entries.</p>
         </div>
-        <Link to="/admin/products/create">
-          <Button className="rounded-xl flex items-center gap-2">
-            <Plus size={20} /> Add Product
+        <div className="flex items-center gap-2">
+          <Button 
+            onClick={() => { setEditingProductId(null); setShowModal(true); }}
+            className="rounded-xl flex items-center gap-2 shadow-sm"
+          >
+            <Plus size={20} /> Add Product / Stock
           </Button>
-        </Link>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
@@ -126,9 +132,17 @@ const ProductManagement = () => {
                       </span>
                     </td>
                     <td className="py-4 px-6 text-sm">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                        {product.isActive ? 'Active' : 'Draft'}
-                      </span>
+                      {product.isActive ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                          Website & Stock
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                          Stock Only (Offline)
+                        </span>
+                      )}
                     </td>
                     <td className="py-4 px-6 text-sm">
                       {product.productLink ? (
@@ -147,11 +161,13 @@ const ProductManagement = () => {
                     </td>
                     <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Link to={`/admin/products/edit/${product._id}`}>
-                          <button className="p-2 text-gray-400 hover:text-primary bg-white hover:bg-primary/10 rounded-lg transition-colors border border-gray-200 hover:border-primary/20">
-                            <Edit size={16} />
-                          </button>
-                        </Link>
+                        <button 
+                          onClick={() => { setEditingProductId(product._id); setShowModal(true); }}
+                          className="p-2 text-gray-400 hover:text-primary bg-white hover:bg-primary/10 rounded-lg transition-colors border border-gray-200 hover:border-primary/20"
+                          title="Edit Product / Stock"
+                        >
+                          <Edit size={16} />
+                        </button>
                         <button 
                           onClick={() => setDeleteConfirm(product._id)}
                           className="p-2 text-gray-400 hover:text-red-500 bg-white hover:bg-red-50 rounded-lg transition-colors border border-gray-200 hover:border-red-200"
@@ -187,6 +203,34 @@ const ProductManagement = () => {
           </div>
         )}
       </div>
+
+      {/* Add / Edit Product Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[92vh] overflow-y-auto shadow-2xl relative p-5 sm:p-8 border border-gray-100 animate-in fade-in duration-200">
+            <button 
+              onClick={() => { setShowModal(false); setEditingProductId(null); }}
+              className="absolute top-5 right-5 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-900 transition-colors z-10"
+              title="Close modal"
+            >
+              <X size={22} />
+            </button>
+            <ProductForm 
+              productId={editingProductId} 
+              isModal={true}
+              onSuccess={() => {
+                setShowModal(false);
+                setEditingProductId(null);
+                fetchProducts();
+              }}
+              onCancel={() => {
+                setShowModal(false);
+                setEditingProductId(null);
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (

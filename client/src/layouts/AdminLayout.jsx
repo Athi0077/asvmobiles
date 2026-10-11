@@ -16,7 +16,8 @@ import {
   Search,
   Bell,
   Bot,
-  Wrench
+  Wrench,
+  Receipt
 } from 'lucide-react';
 import AdminAIAssistant from '../components/AdminAIAssistant';
 
@@ -43,8 +44,11 @@ const AdminLayout = () => {
     navigate('/admin/login');
   };
 
+  const isBillingAdmin = user?.email?.toLowerCase() === 'admininvoice@asv.com';
+
   const menuItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+    { name: 'Billing (POS)', path: '/admin/billing', icon: Receipt },
     { name: 'Products', path: '/admin/products', icon: Package },
     { name: 'Categories', path: '/admin/categories', icon: Grid },
     { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
@@ -154,7 +158,9 @@ const AdminLayout = () => {
                 </div>
                 <div className="hidden sm:block text-left">
                   <p className="text-sm font-bold text-gray-900 leading-none">{user.name}</p>
-                  <p className="text-xs text-gray-500 mt-1">Administrator</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {isBillingAdmin ? 'Billing Admin' : 'Administrator'}
+                  </p>
                 </div>
               </button>
 

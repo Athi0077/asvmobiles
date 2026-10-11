@@ -4,6 +4,7 @@ import cors from 'cors';
 import path from 'path';
 import { connectDB } from './config/db.js';
 import Category from './models/categoryModel.js';
+import User from './models/userModel.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
@@ -21,6 +22,7 @@ import authRoutes from './routes/authRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
 import priceComparisonRoutes from './routes/priceComparisonRoutes.js';
+import billRoutes from './routes/billRoutes.js';
 
 import dns from 'node:dns';
 dns.setServers(['8.8.8.8', '8.8.4.4']);
@@ -46,8 +48,38 @@ connectDB().then(async () => {
       ]);
       console.log('New categories seeded successfully!');
     }
+
+    // Seed/Ensure Billing Admin user
+    const billingEmail = (process.env.BILLING_ADMIN_EMAIL || 'admininvoice@asv.com').toLowerCase();
+    const billingPass = process.env.BILLING_ADMIN_PASSWORD || 'asmininvoice123asv';
+    let billingUser = await User.findOne({ email: billingEmail });
+
+    if (!billingUser) {
+      await User.create({
+        name: 'ASV Billing Admin',
+        email: billingEmail,
+        password: billingPass,
+        role: 'admin',
+      });
+      console.log(`Billing admin user created: ${billingEmail}`);
+    } else {
+      let isChanged = false;
+      if (billingUser.role !== 'admin') {
+        billingUser.role = 'admin';
+        isChanged = true;
+      }
+      const isMatch = await billingUser.matchPassword(billingPass);
+      if (!isMatch) {
+        billingUser.password = billingPass;
+        isChanged = true;
+      }
+      if (isChanged) {
+        await billingUser.save();
+        console.log(`Billing admin credentials verified/updated: ${billingEmail}`);
+      }
+    }
   } catch (error) {
-    console.error('Category seeding error:', error);
+    console.error('Database seeding error:', error);
   }
 });
 
@@ -95,6 +127,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/price-comparison', priceComparisonRoutes);
+app.use('/api/bills', billRoutes);
 
 // Make uploads folder static
 const __dirname = path.resolve();
