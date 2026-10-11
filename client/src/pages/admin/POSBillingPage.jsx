@@ -58,9 +58,27 @@ const POSBillingPage = () => {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyKeyword, setHistoryKeyword] = useState('');
   const [historyPaymentMode, setHistoryPaymentMode] = useState('All');
+  const [historyDate, setHistoryDate] = useState('');
   const [historyPage, setHistoryPage] = useState(1);
   const [historyPages, setHistoryPages] = useState(1);
   const [todaySummary, setTodaySummary] = useState({ totalRevenue: 0, totalBills: 0, cashTotal: 0, upiTotal: 0 });
+
+  const getTodayDateString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const getYesterdayDateString = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   const searchDebounceRef = useRef(null);
 
@@ -92,7 +110,7 @@ const POSBillingPage = () => {
     if (activeTab === 'history') {
       fetchHistory();
     }
-  }, [activeTab, historyPage, historyKeyword, historyPaymentMode]);
+  }, [activeTab, historyPage, historyKeyword, historyPaymentMode, historyDate]);
 
   const fetchHistory = async () => {
     setHistoryLoading(true);
@@ -101,6 +119,7 @@ const POSBillingPage = () => {
         page: historyPage,
         keyword: historyKeyword,
         paymentMode: historyPaymentMode,
+        date: historyDate,
       });
       setBillsList(data.bills || []);
       setHistoryPages(data.pages || 1);
@@ -665,8 +684,9 @@ const POSBillingPage = () => {
 
           {/* Filters & Table */}
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row gap-3 items-center justify-between">
-              <div className="relative w-full sm:w-80">
+            <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex flex-col lg:flex-row gap-3 items-center justify-between">
+              {/* Search bar */}
+              <div className="relative w-full lg:w-72">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                 <input
                   type="text"
@@ -677,11 +697,68 @@ const POSBillingPage = () => {
                 />
               </div>
 
-              <div className="flex items-center gap-2 w-full sm:w-auto">
+              {/* Date Presets, Date Picker & Payment Mode */}
+              <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
+                {/* Date Quick Presets */}
+                <div className="flex items-center p-0.5 bg-gray-200/60 rounded-xl text-xs font-bold">
+                  <button
+                    onClick={() => { setHistoryDate(''); setHistoryPage(1); }}
+                    className={`px-2.5 py-1.5 rounded-lg transition-all ${
+                      !historyDate ? 'bg-white text-primary shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={() => { setHistoryDate(getTodayDateString()); setHistoryPage(1); }}
+                    className={`px-2.5 py-1.5 rounded-lg transition-all ${
+                      historyDate === getTodayDateString() ? 'bg-white text-primary shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    Today
+                  </button>
+                  <button
+                    onClick={() => { setHistoryDate(getYesterdayDateString()); setHistoryPage(1); }}
+                    className={`px-2.5 py-1.5 rounded-lg transition-all ${
+                      historyDate === getYesterdayDateString() ? 'bg-white text-primary shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    Yesterday
+                  </button>
+                </div>
+
+                {/* Specific Date Picker Input */}
+                <div className="flex items-center gap-1.5 bg-white border border-gray-200 rounded-xl px-2.5 py-1.5 focus-within:border-primary transition-all shadow-sm">
+                  <Calendar size={14} className="text-primary flex-shrink-0" />
+                  <input
+                    type="date"
+                    value={historyDate}
+                    onChange={(e) => {
+                      setHistoryDate(e.target.value);
+                      setHistoryPage(1);
+                    }}
+                    className="text-xs text-gray-700 outline-none bg-transparent font-medium cursor-pointer"
+                    title="Select specific date"
+                  />
+                  {historyDate && (
+                    <button
+                      onClick={() => {
+                        setHistoryDate('');
+                        setHistoryPage(1);
+                      }}
+                      className="text-gray-400 hover:text-red-500 p-0.5"
+                      title="Clear date filter"
+                    >
+                      <X size={13} />
+                    </button>
+                  )}
+                </div>
+
+                {/* Payment Mode Selector */}
                 <select
                   value={historyPaymentMode}
                   onChange={(e) => { setHistoryPaymentMode(e.target.value); setHistoryPage(1); }}
-                  className="bg-white border border-gray-200 rounded-xl py-2 px-3 text-xs font-medium text-gray-700 outline-none"
+                  className="bg-white border border-gray-200 rounded-xl py-2 px-3 text-xs font-medium text-gray-700 outline-none shadow-sm cursor-pointer"
                 >
                   <option value="All">All Payment Modes</option>
                   <option value="Cash">Cash</option>
@@ -689,15 +766,32 @@ const POSBillingPage = () => {
                   <option value="Card">Card</option>
                 </select>
 
+                {/* Refresh */}
                 <button
                   onClick={fetchHistory}
-                  className="p-2 bg-white hover:bg-gray-100 rounded-xl border border-gray-200 text-gray-600 transition-colors"
-                  title="Refresh"
+                  className="p-2 bg-white hover:bg-gray-100 rounded-xl border border-gray-200 text-gray-600 transition-colors shadow-sm"
+                  title="Refresh bills"
                 >
-                  <RefreshCw size={16} />
+                  <RefreshCw size={15} />
                 </button>
               </div>
             </div>
+
+            {/* Active Date Filter Notice Pill if filtered */}
+            {historyDate && (
+              <div className="px-5 py-2 bg-primary/5 border-b border-primary/10 flex items-center justify-between text-xs">
+                <span className="text-gray-700 font-medium flex items-center gap-1.5">
+                  <Calendar size={13} className="text-primary" />
+                  Filtered by Date: <strong className="text-primary font-bold">{new Date(historyDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</strong>
+                </span>
+                <button
+                  onClick={() => { setHistoryDate(''); setHistoryPage(1); }}
+                  className="text-primary hover:text-primary-dark font-bold underline text-xs"
+                >
+                  Reset to All Dates
+                </button>
+              </div>
+            )}
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">

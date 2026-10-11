@@ -177,11 +177,13 @@ export const getBills = async (req, res, next) => {
     }
 
     if (date) {
-      const startOfDay = new Date(date);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(date);
-      endOfDay.setHours(23, 59, 59, 999);
-      query.createdAt = { $gte: startOfDay, $lte: endOfDay };
+      const parts = date.split('-').map(Number);
+      if (parts.length === 3 && !parts.some(isNaN)) {
+        const [year, month, day] = parts;
+        const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
+        const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
+        query.createdAt = { $gte: startOfDay, $lte: endOfDay };
+      }
     }
 
     const total = await Bill.countDocuments(query);
