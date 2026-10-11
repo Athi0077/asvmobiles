@@ -825,8 +825,15 @@ const POSBillingPage = () => {
                   ) : (
                     billsList.map((bill) => (
                       <tr key={bill._id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="py-4 px-6 font-mono font-bold text-primary">
-                          {bill.billNumber}
+                        <td className="py-4 px-6">
+                          <span className="font-mono font-bold text-primary block">
+                            {bill.billNumber}
+                          </span>
+                          {bill.serviceId && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 mt-0.5">
+                              Repair: {bill.serviceId}
+                            </span>
+                          )}
                         </td>
                         <td className="py-4 px-6 text-xs text-gray-500">
                           {new Date(bill.createdAt).toLocaleDateString()} {new Date(bill.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -838,7 +845,12 @@ const POSBillingPage = () => {
                           )}
                         </td>
                         <td className="py-4 px-6 text-xs text-gray-600">
-                          {bill.items?.length || 0} item(s)
+                          <div>{bill.items?.length || 0} item(s)</div>
+                          {bill.billType === 'Service' && bill.items?.[0] && (
+                            <div className="text-[11px] text-gray-400 truncate max-w-[160px]" title={bill.items[0].name}>
+                              {bill.items[0].name}
+                            </div>
+                          )}
                         </td>
                         <td className="py-4 px-6">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${

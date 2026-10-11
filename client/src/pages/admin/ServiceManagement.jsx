@@ -6,10 +6,15 @@ import {
   updateServiceStatus, 
   deleteServiceRecord 
 } from '../../services/serviceTrackingService';
-import { Plus, Edit, Trash2, Settings as Wrench, X, Search, Filter, Copy, MessageCircle, Eye } from 'lucide-react';
+import { 
+  Plus, Edit, Trash2, Settings as Wrench, X, Search, Filter, Copy, MessageCircle, Eye,
+  Receipt, CheckCircle2, CreditCard, Banknote, QrCode, Printer, Loader2
+} from 'lucide-react';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import toast from 'react-hot-toast';
+import { createBill, getBillById, getBills } from '../../services/billingService';
+import InvoiceReceiptModal from '../../components/InvoiceReceiptModal';
 
 const ServiceManagement = () => {
   const [services, setServices] = useState([]);
@@ -25,6 +30,19 @@ const ServiceManagement = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
   const [currentService, setCurrentService] = useState(null);
+
+  // Billing States
+  const [billModalService, setBillModalService] = useState(null);
+  const [billForm, setBillForm] = useState({
+    description: '',
+    amount: '',
+    discount: '',
+    paymentMode: 'Cash',
+    notes: ''
+  });
+  const [billSubmitting, setBillSubmitting] = useState(false);
+  const [billToPrint, setBillToPrint] = useState(null);
+  const [billLoadingId, setBillLoadingId] = useState(null);
 
   const [formData, setFormData] = useState({
     customerName: '',
@@ -159,6 +177,102 @@ const ServiceManagement = () => {
     
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
+  };
+
+  // Open Service Bill creation modal
+  const handleOpenBillModal = (service) => {
+    setBillModalService(service);
+    const brand = service.deviceBrand ? service.deviceBrand.trim() + ' ' : '';
+    const model = service.deviceModel ? service.deviceModel.trim() : '';
+    const dev = (brand + model).trim();
+    const defaultDesc = `Service: ${dev ? dev + ' - ' : ''}${service.serviceName} (${service.serviceId})`;
+
+    setBillForm({
+      description: defaultDesc,
+      amount: service.amount !== undefined ? String(service.amount) : '',
+      discount: '',
+      paymentMode: 'Cash',
+      notes: service.notes || ''
+    });
+  };
+
+  // View or re-print already generated bill
+  const handleViewOrPrintBill = async (service) => {
+    try {
+      setBillLoadingId(service._id);
+      let bill = null;
+      if (service.billId) {
+        bill = await getBillById(service.billId);
+      }
+      if (!bill && service.billNumber) {
+        const res = await getBills({ keyword: service.billNumber, limit: 1 });
+        bill = res.bills?.find(b => b.billNumber === service.billNumber);
+      }
+      if (bill) {
+        setBillToPrint(bill);
+      } else {
+        toast.error('Bill details not found');
+      }
+    } catch (err) {
+      toast.error('Failed to load bill');
+    } finally {
+      setBillLoadingId(null);
+    }
+  };
+
+  // Handle bill creation submit
+  const handleGenerateServiceBill = async (e) => {
+    e.preventDefault();
+    if (!billModalService) return;
+
+    const price = Number(billForm.amount);
+    const discountVal = Number(billForm.discount) || 0;
+
+    if (isNaN(price) || price < 0) {
+      toast.error('Please enter a valid service amount');
+      return;
+    }
+
+    setBillSubmitting(true);
+    try {
+      const billPayload = {
+        customerName: billModalService.customerName,
+        customerPhone: billModalService.customerPhone,
+        items: [
+          {
+            product: null,
+            name: billForm.description.trim() || `Service Repair - ${billModalService.serviceId}`,
+            price: price,
+            qty: 1,
+            total: price
+          }
+        ],
+        discount: discountVal,
+        tax: 0,
+        paymentMode: billForm.paymentMode,
+        paymentStatus: 'Paid',
+        notes: billForm.notes || '',
+        serviceRecordId: billModalService._id,
+        serviceId: billModalService.serviceId,
+        billType: 'Service'
+      };
+
+      const res = await createBill(billPayload);
+      toast.success(`Bill ${res.bill?.billNumber || ''} created & saved to history!`);
+      
+      const createdBill = res.bill;
+      setBillModalService(null);
+      await fetchServices();
+
+      // Immediately open print receipt modal
+      if (createdBill) {
+        setBillToPrint(createdBill);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to generate bill');
+    } finally {
+      setBillSubmitting(false);
+    }
   };
 
   // Derived state for filtered services
@@ -296,7 +410,18 @@ const ServiceManagement = () => {
                       <p className="text-sm font-medium text-gray-800">{service.deviceBrand} {service.deviceModel}</p>
                       <p className="text-xs text-gray-500 truncate max-w-[200px]">{service.serviceName}</p>
                     </td>
-                    <td className="py-4 px-6 text-sm font-bold text-gray-900">₹{service.amount}</td>
+                    <td className="py-4 px-6">
+                      <div className="text-sm font-bold text-gray-900">₹{service.amount}</div>
+                      {service.isBilled ? (
+                        <div className="flex items-center gap-1 mt-1">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <CheckCircle2 size={10} /> {service.billNumber || 'Billed'}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="inline-block text-[10px] text-gray-400 mt-0.5">Unbilled</span>
+                      )}
+                    </td>
                     <td className="py-4 px-6">
                       <select 
                         value={service.status}
@@ -310,21 +435,41 @@ const ServiceManagement = () => {
                       </select>
                     </td>
                     <td className="py-4 px-6 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-1.5">
+                        {service.isBilled ? (
+                          <button 
+                            onClick={() => handleViewOrPrintBill(service)} 
+                            disabled={billLoadingId === service._id}
+                            className="p-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors flex items-center gap-1 text-xs font-semibold"
+                            title={`View/Print Bill (${service.billNumber})`}
+                          >
+                            {billLoadingId === service._id ? <Loader2 size={16} className="animate-spin" /> : <Receipt size={17} />}
+                            <span className="hidden xl:inline text-[11px] font-bold">Print Bill</span>
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={() => handleOpenBillModal(service)} 
+                            className="p-1.5 text-primary hover:text-primary-dark hover:bg-primary/10 rounded-lg transition-colors flex items-center gap-1 text-xs font-semibold"
+                            title="Add to Billing / Generate Invoice"
+                          >
+                            <Receipt size={17} />
+                            <span className="hidden xl:inline text-[11px] font-bold">Add Bill</span>
+                          </button>
+                        )}
                         <button onClick={() => openViewModal(service)} className="p-1.5 text-gray-400 hover:text-primary transition-colors" title="View Details">
-                          <Eye size={18} />
+                          <Eye size={17} />
                         </button>
                         <button onClick={() => copyToClipboard(service.trackingToken)} className="p-1.5 text-gray-400 hover:text-blue-500 transition-colors" title="Copy Tracking Link">
-                          <Copy size={18} />
+                          <Copy size={17} />
                         </button>
                         <button onClick={() => shareOnWhatsApp(service)} className="p-1.5 text-gray-400 hover:text-green-500 transition-colors" title="Share via WhatsApp">
-                          <MessageCircle size={18} />
+                          <MessageCircle size={17} />
                         </button>
                         <button onClick={() => openEditModal(service)} className="p-1.5 text-gray-400 hover:text-primary transition-colors" title="Edit">
-                          <Edit size={18} />
+                          <Edit size={17} />
                         </button>
                         <button onClick={() => setDeleteConfirm(service._id)} className="p-1.5 text-gray-400 hover:text-red-500 transition-colors" title="Delete">
-                          <Trash2 size={18} />
+                          <Trash2 size={17} />
                         </button>
                       </div>
                     </td>
@@ -364,15 +509,41 @@ const ServiceManagement = () => {
                 <div>
                   <p className="text-sm font-medium">{service.deviceBrand} {service.deviceModel}</p>
                   <p className="text-sm text-gray-500">{service.serviceName}</p>
-                  <p className="text-sm font-bold text-gray-900 mt-1">₹{service.amount}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-sm font-bold text-gray-900">₹{service.amount}</p>
+                    {service.isBilled ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <CheckCircle2 size={10} /> {service.billNumber}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-gray-400">Unbilled</span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex justify-between items-center border-t border-gray-50 pt-3 mt-1">
-                  <button onClick={() => openViewModal(service)} className="text-sm text-gray-600 flex items-center gap-1"><Eye size={16}/> View</button>
-                  <div className="flex gap-4">
-                    <button onClick={() => copyToClipboard(service.trackingToken)} className="text-gray-400 hover:text-blue-500"><Copy size={18} /></button>
-                    <button onClick={() => shareOnWhatsApp(service)} className="text-gray-400 hover:text-green-500"><MessageCircle size={18} /></button>
-                    <button onClick={() => openEditModal(service)} className="text-gray-400 hover:text-primary"><Edit size={18} /></button>
-                    <button onClick={() => setDeleteConfirm(service._id)} className="text-gray-400 hover:text-red-500"><Trash2 size={18} /></button>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => openViewModal(service)} className="text-xs text-gray-600 flex items-center gap-1"><Eye size={15}/> View</button>
+                    {service.isBilled ? (
+                      <button 
+                        onClick={() => handleViewOrPrintBill(service)} 
+                        className="text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-1 rounded-lg flex items-center gap-1"
+                      >
+                        <Receipt size={13}/> Print
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => handleOpenBillModal(service)} 
+                        className="text-xs font-bold text-primary bg-primary/10 hover:bg-primary/20 border border-primary/20 px-2 py-1 rounded-lg flex items-center gap-1"
+                      >
+                        <Receipt size={13}/> Add Bill
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex gap-3">
+                    <button onClick={() => copyToClipboard(service.trackingToken)} className="text-gray-400 hover:text-blue-500"><Copy size={16} /></button>
+                    <button onClick={() => shareOnWhatsApp(service)} className="text-gray-400 hover:text-green-500"><MessageCircle size={16} /></button>
+                    <button onClick={() => openEditModal(service)} className="text-gray-400 hover:text-primary"><Edit size={16} /></button>
+                    <button onClick={() => setDeleteConfirm(service._id)} className="text-gray-400 hover:text-red-500"><Trash2 size={16} /></button>
                   </div>
                 </div>
               </div>
@@ -493,6 +664,45 @@ const ServiceManagement = () => {
                     <p className="text-lg font-black text-primary mt-1">₹{currentService.amount}</p>
                   </div>
 
+                  {/* Billing status box */}
+                  {currentService.isBilled ? (
+                    <div className="bg-emerald-50 rounded-xl p-3.5 border border-emerald-200 flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                          <Receipt size={18} />
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-emerald-800 font-bold uppercase tracking-wider">Bill Generated</p>
+                          <p className="text-sm font-black text-emerald-950 font-mono">{currentService.billNumber}</p>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={() => handleViewOrPrintBill(currentService)}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs flex items-center gap-1.5 shadow-sm py-1.5 px-3"
+                      >
+                        <Printer size={13} /> View / Print
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="bg-amber-50 rounded-xl p-3.5 border border-amber-200 flex items-center justify-between gap-2">
+                      <div>
+                        <p className="text-[10px] text-amber-800 font-bold uppercase tracking-wider">Billing Status</p>
+                        <p className="text-xs text-amber-900 font-semibold mt-0.5">Not added to billing</p>
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setIsViewModalOpen(false);
+                          handleOpenBillModal(currentService);
+                        }}
+                        className="rounded-lg text-xs flex items-center gap-1.5 shadow-sm py-1.5 px-3"
+                      >
+                        <Receipt size={13} /> Add to Billing
+                      </Button>
+                    </div>
+                  )}
+
                   {currentService.notes && (
                     <div>
                       <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Notes</p>
@@ -575,6 +785,181 @@ const ServiceManagement = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Generate Service Bill Modal */}
+      {billModalService && (
+        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl space-y-5 animate-in fade-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                  <Receipt size={22} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-lg">Generate Service Bill</h3>
+                  <p className="text-xs text-gray-500 font-mono">Service ID: {billModalService.serviceId}</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setBillModalService(null)} 
+                className="p-1.5 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Customer & Device quick banner */}
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100/60 p-4 rounded-2xl border border-gray-200/60 space-y-1.5 text-xs">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500">Customer:</span>
+                <span className="font-bold text-gray-900">{billModalService.customerName} ({billModalService.customerPhone})</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500">Device:</span>
+                <span className="font-semibold text-gray-800">{billModalService.deviceBrand} {billModalService.deviceModel} ({billModalService.deviceType})</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500">Repair Task:</span>
+                <span className="font-semibold text-gray-800">{billModalService.serviceName}</span>
+              </div>
+            </div>
+
+            <form onSubmit={handleGenerateServiceBill} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  Bill Item Description
+                </label>
+                <input
+                  type="text"
+                  value={billForm.description}
+                  onChange={(e) => setBillForm(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full bg-white border border-gray-200 rounded-xl py-2.5 px-3 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary font-medium"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                    Service Charge (₹)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={billForm.amount}
+                    onChange={(e) => setBillForm(prev => ({ ...prev, amount: e.target.value }))}
+                    className="w-full bg-white border border-gray-200 rounded-xl py-2.5 px-3 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary font-bold text-gray-900"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                    Discount (₹)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={billForm.discount}
+                    onChange={(e) => setBillForm(prev => ({ ...prev, discount: e.target.value }))}
+                    className="w-full bg-white border border-gray-200 rounded-xl py-2.5 px-3 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
+
+              {/* Payment Mode Selector */}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Payment Mode
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'Cash', label: 'Cash', icon: Banknote },
+                    { id: 'UPI', label: 'UPI / QR', icon: QrCode },
+                    { id: 'Card', label: 'Card', icon: CreditCard },
+                  ].map(pm => {
+                    const Icon = pm.icon;
+                    const isSelected = billForm.paymentMode === pm.id;
+                    return (
+                      <button
+                        type="button"
+                        key={pm.id}
+                        onClick={() => setBillForm(prev => ({ ...prev, paymentMode: pm.id }))}
+                        className={`py-2 px-3 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${
+                          isSelected
+                            ? 'border-primary bg-primary/10 text-primary font-bold shadow-sm ring-1 ring-primary'
+                            : 'border-gray-200 hover:border-gray-300 text-gray-600 bg-white'
+                        }`}
+                      >
+                        <Icon size={18} />
+                        <span className="text-xs">{pm.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  Notes / Warranty Remarks (Optional)
+                </label>
+                <textarea
+                  rows="2"
+                  value={billForm.notes}
+                  onChange={(e) => setBillForm(prev => ({ ...prev, notes: e.target.value }))}
+                  placeholder="e.g. 3 Months warranty for replaced screen"
+                  className="w-full bg-white border border-gray-200 rounded-xl py-2 px-3 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                />
+              </div>
+
+              {/* Net Total Box */}
+              <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-3.5 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold text-emerald-800">Total Billed Amount</p>
+                  <p className="text-[11px] text-emerald-600">Saved directly to Billing History & Day Book</p>
+                </div>
+                <span className="text-xl font-black text-emerald-700">
+                  ₹{Math.max(0, (Number(billForm.amount) || 0) - (Number(billForm.discount) || 0)).toFixed(2)}
+                </span>
+              </div>
+
+              <div className="flex gap-2.5 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 rounded-xl"
+                  onClick={() => setBillModalService(null)}
+                  disabled={billSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
+                  disabled={billSubmitting}
+                >
+                  {billSubmitting ? (
+                    'Creating Bill...'
+                  ) : (
+                    <>
+                      <Receipt size={17} /> Generate & Save Bill
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Invoice Receipt Modal */}
+      {billToPrint && (
+        <InvoiceReceiptModal
+          bill={billToPrint}
+          onClose={() => setBillToPrint(null)}
+        />
       )}
     </div>
   );

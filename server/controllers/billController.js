@@ -1,6 +1,7 @@
 import Bill from '../models/billModel.js';
 import Product from '../models/productModel.js';
 import Counter from '../models/counterModel.js';
+import Service from '../models/serviceModel.js';
 
 // @desc    Search products for POS billing (Both website products & internal stock)
 // @route   GET /api/bills/search-products
@@ -49,7 +50,10 @@ export const createBill = async (req, res, next) => {
       tax = 0,
       paymentMode = 'Cash',
       paymentStatus = 'Paid',
-      notes = ''
+      notes = '',
+      serviceRecordId,
+      serviceId,
+      billType
     } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -137,9 +141,25 @@ export const createBill = async (req, res, next) => {
       notes: notes?.trim() || '',
       billedBy: req.user?._id,
       billedByName: req.user?.name || 'Cashier',
+      serviceRecordId: serviceRecordId || null,
+      serviceId: serviceId || '',
+      billType: billType || (serviceRecordId ? 'Service' : 'Product'),
     });
 
     const savedBill = await bill.save();
+
+    // If this bill is generated for a service repair, update the service record
+    if (serviceRecordId) {
+      try {
+        await Service.findByIdAndUpdate(serviceRecordId, {
+          isBilled: true,
+          billNumber: savedBill.billNumber,
+          billId: savedBill._id
+        });
+      } catch (svcErr) {
+        console.error('Failed to update service with bill details:', svcErr);
+      }
+    }
 
     res.status(201).json({
       success: true,

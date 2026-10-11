@@ -79,6 +79,18 @@ const serviceSchema = new mongoose.Schema({
     required: true,
     index: true
   },
+  isBilled: {
+    type: Boolean,
+    default: false
+  },
+  billNumber: {
+    type: String,
+    default: ''
+  },
+  billId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Bill'
+  },
   statusHistory: [statusHistorySchema]
 }, {
   timestamps: true

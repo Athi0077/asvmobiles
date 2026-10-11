@@ -89,6 +89,20 @@ const billSchema = new mongoose.Schema(
       type: String,
       default: 'Cashier',
     },
+    serviceRecordId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Service',
+      default: null,
+    },
+    serviceId: {
+      type: String,
+      default: '',
+    },
+    billType: {
+      type: String,
+      enum: ['Product', 'Service', 'Mixed'],
+      default: 'Product',
+    },
   },
   {
     timestamps: true,
