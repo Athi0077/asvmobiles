@@ -23,6 +23,7 @@ import aiRoutes from './routes/aiRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
 import priceComparisonRoutes from './routes/priceComparisonRoutes.js';
 import billRoutes from './routes/billRoutes.js';
+import labelTemplateRoutes from './routes/labelTemplateRoutes.js';
 
 import dns from 'node:dns';
 dns.setServers(['8.8.8.8', '8.8.4.4']);
@@ -128,6 +129,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/price-comparison', priceComparisonRoutes);
 app.use('/api/bills', billRoutes);
+app.use('/api/label-templates', labelTemplateRoutes);
 
 // Make uploads folder static
 const __dirname = path.resolve();

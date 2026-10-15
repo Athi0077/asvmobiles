@@ -17,7 +17,8 @@ import {
   Bell,
   Bot,
   Wrench,
-  Receipt
+  Receipt,
+  Printer
 } from 'lucide-react';
 import AdminAIAssistant from '../components/AdminAIAssistant';
 
@@ -49,6 +50,7 @@ const AdminLayout = () => {
   const menuItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Billing (POS)', path: '/admin/billing', icon: Receipt },
+    { name: 'Labeling', path: '/admin/labeling', icon: Printer },
     { name: 'Products', path: '/admin/products', icon: Package },
     { name: 'Categories', path: '/admin/categories', icon: Grid },
     { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },

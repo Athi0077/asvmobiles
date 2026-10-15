@@ -34,6 +34,7 @@ import Settings from './pages/admin/Settings';
 import AdminAIPage from './pages/admin/AdminAIPage';
 import ServiceManagement from './pages/admin/ServiceManagement';
 import POSBillingPage from './pages/admin/POSBillingPage';
+import LabelPrintingPage from './pages/admin/LabelPrintingPage';
 
 const NotFound = () => <div className="p-8 text-center"><h2 className="text-2xl font-bold text-red-500">404 - Page Not Found</h2></div>;
 
@@ -85,6 +86,7 @@ function App() {
           <Route path="ai-assistant" element={<AdminAIPage />} />
           <Route path="settings" element={<Settings />} />
           <Route path="billing" element={<POSBillingPage />} />
+          <Route path="labeling" element={<LabelPrintingPage />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
